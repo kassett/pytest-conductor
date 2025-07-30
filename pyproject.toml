@@ -32,7 +32,6 @@ conductor = "pytest_conductor.core"
 [tool.hatch.envs.default]
 dev-mode = true
 python = "3.13"
-features = ["dev"]
 
 [tool.hatch.envs.default.env-vars]
 PYTHONPATH = "src"
