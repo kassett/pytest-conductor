@@ -1,12 +1,64 @@
 # pytest-conductor
 
-A pytest plugin that allows you to control the order in which tests run based on their tags (markers) or fixtures.
+A pytest plugin that allows you to control the order in which tests run based on their tags (markers) or fixtures. Perfect for coordinating test execution in CI/CD pipelines, managing test dependencies, and optimizing test suite performance.
+
+## ✨ Features
+
+- **🎯 Tag-based Ordering**: Order tests by pytest markers (fast → slow → integration)
+- **🔧 Fixture-based Ordering**: Order tests by the fixtures they use (db → redis → cache)
+- **⚡ Unmatched Test Handling**: Control how tests without matching tags/fixtures are handled
+- **🚫 Skip Unmatched Tests**: Option to skip tests that don't match the order list entirely
+- **🛡️ Error Validation**: Automatic validation of fixture availability for reliable ordering
+- **📊 Performance Optimized**: Minimal overhead with efficient sorting algorithms
+- **🔍 Comprehensive Testing**: Full test suite with unit tests and integration tests
+- **🎭 Interactive Demo**: Built-in demo showing all features with detailed logging
 
 ## Installation
 
 ```bash
 pip install pytest-conductor
 ```
+
+## 🎭 Quick Demo
+
+See pytest-conductor in action with our interactive demo:
+
+```bash
+# Clone the repository
+git clone https://github.com/your-username/pytest-conductor.git
+cd pytest-conductor
+
+# Run the interactive demo
+hatch run demo
+```
+
+The demo shows:
+- Tag ordering (fast → slow → integration)
+- Fixture ordering (basic_calculator → advanced_calculator → sample_data)
+- Unmatched test handling (first, last, none)
+- Error handling for invalid configurations
+
+## 📁 Example Project
+
+The repository includes a complete example project demonstrating real-world usage:
+
+```bash
+# Navigate to the example project
+cd example
+
+# Install dependencies and pytest-conductor
+hatch run pip install -e ../
+
+# Run tests with coordination
+hatch run pytest --tag-order fast slow -v
+hatch run pytest --fixture-order basic_calculator advanced_calculator --ordering-mode fixture -v
+```
+
+The example project includes:
+- Calculator application with basic and advanced operations
+- Comprehensive test suite with different tags and fixtures
+- Global and local fixtures demonstrating scope validation
+- Integration tests showing all plugin features
 
 ## Usage
 
@@ -39,6 +91,25 @@ This will run all tests that use the `db` fixture first, then tests using `redis
 
 **⚠️ Important Limitation**: Fixture ordering only works with fixtures that are globally available to all tests. The plugin will throw an error if you try to order by a fixture that is not available to all tests in your test suite. This ensures reliable ordering behavior.
 
+### Error Handling and Validation
+
+The plugin includes robust error handling to prevent configuration issues:
+
+#### Fixture Availability Validation
+When using fixture ordering, the plugin validates that all specified fixtures are available to all tests:
+
+```bash
+# This will fail if 'nonexistent_fixture' is not available to all tests
+pytest --fixture-order nonexistent_fixture --ordering-mode fixture
+```
+
+**Error Message**: `ValueError: Fixtures not available to all tests: nonexistent_fixture. Fixture ordering requires all fixtures to be globally available. Make sure these fixtures are defined in a conftest.py file that is accessible to all tests, or use mark ordering instead.`
+
+#### Best Practices
+- Use global fixtures defined in a root-level `conftest.py` file
+- Use mark ordering for tests with local or conditional fixtures
+- Test your configuration with `--collect-only` to catch issues early
+
 ### Handling Unmatched Tests
 
 Use the `--unmatched-order` option to control how tests without matching tags/fixtures are handled:
@@ -58,6 +129,18 @@ pytest --fixture-order db redis --ordering-mode fixture --unmatched-order any
 
 # Skip unmatched tests entirely
 pytest --tag-order fast slow --unmatched-order none
+pytest --fixture-order db redis --ordering-mode fixture --unmatched-order none
+```
+
+### New in v0.1.0: Skip Unmatched Tests
+
+The `--unmatched-order none` option is a new feature that allows you to skip tests that don't match your specified order list entirely. This is useful when you want to run only a specific subset of tests:
+
+```bash
+# Run only fast and slow tests, skip all others
+pytest --tag-order fast slow --unmatched-order none
+
+# Run only tests using specific fixtures, skip all others  
 pytest --fixture-order db redis --ordering-mode fixture --unmatched-order none
 ```
 
@@ -297,45 +380,109 @@ The plugin includes comprehensive tests for edge cases. To verify the behavior:
 ### Run Edge Case Tests
 ```bash
 # Run the edge case test suite
-pytest src/tests/test_edge_cases.py -v
+pytest src/unit_tests/test_edge_cases.py -v
 
 # Run practical examples
-pytest src/tests/test_edge_case_examples.py -v
+pytest src/unit_tests/test_edge_case_examples.py -v
 ```
 
 ### Test Multiple Tags Ordering
 ```bash
 # Test that tests with multiple tags run only once
-pytest src/tests/test_edge_case_examples.py --tag-order fast slow integration -v
+pytest src/unit_tests/test_edge_case_examples.py --tag-order fast slow integration -v
 ```
 
 ### Test Multiple Fixtures Ordering
 ```bash
 # Test that tests with multiple fixtures run only once
-pytest src/tests/test_edge_case_examples.py --fixture-order db redis cache --ordering-mode fixture -v
+pytest src/unit_tests/test_edge_case_examples.py --fixture-order db redis cache --ordering-mode fixture -v
 ```
 
 ### Test Unmatched Test Handling
 ```bash
 # Test unmatched tests running first
-pytest src/tests/test_edge_case_examples.py --tag-order fast slow --unmatched-order first -v
+pytest src/unit_tests/test_edge_case_examples.py --tag-order fast slow --unmatched-order first -v
 
 # Test unmatched tests running last
-pytest src/tests/test_edge_case_examples.py --tag-order fast slow --unmatched-order last -v
+pytest src/unit_tests/test_edge_case_examples.py --tag-order fast slow --unmatched-order last -v
 ```
 
-## Development
+## 🛠️ Development
 
-To install in development mode:
+### Installation
 
 ```bash
+# Clone the repository
+git clone https://github.com/your-username/pytest-conductor.git
+cd pytest-conductor
+
+# Install in development mode
 pip install -e .
 ```
 
-To run tests:
+### Test Structure
+
+The project uses a comprehensive test structure:
+
+```
+src/
+├── pytest_conductor/          # Main plugin code
+├── unit_tests/               # Unit tests for the plugin itself
+│   ├── test_tag_ordering.py
+│   ├── test_fixture_ordering.py
+│   ├── test_fixture_validation.py
+│   ├── test_unmatched_none.py
+│   └── ... (8 test files total)
+└── integration_tests/        # Integration tests using the example project
+    ├── test_pytest_conductor_integration.py
+    └── README.md
+```
+
+### Running Tests
 
 ```bash
-pytest src/tests/
+# Run unit tests only (test the plugin's core functionality)
+hatch run unit-tests
+
+# Run integration tests only (test with real-world example project)
+hatch run integration-tests
+
+# Run all tests
+hatch run unit-tests && hatch run integration-tests
+
+# Run the interactive demo (shows test coordination with detailed logging)
+hatch run demo
+```
+
+### Example Project Testing
+
+```bash
+# Navigate to example project
+cd example
+
+# Install pytest-conductor in the example environment
+hatch run pip install -e ../
+
+# Run example tests with coordination
+hatch run pytest --tag-order fast slow -v
+hatch run pytest --fixture-order basic_calculator advanced_calculator --ordering-mode fixture -v
+```
+
+## 📋 Project Structure
+
+```
+pytest-conductor/
+├── src/
+│   ├── pytest_conductor/          # Main plugin code
+│   ├── unit_tests/               # Unit tests for the plugin
+│   └── integration_tests/        # Integration tests with example project
+├── example/                      # Complete example project
+│   ├── src/
+│   │   ├── calculator/           # Example application
+│   │   └── tests/               # Example tests with various tags/fixtures
+│   └── pyproject.toml           # Example project configuration
+├── pyproject.toml               # Main project configuration
+└── README.md                    # This file
 ```
 
 ## Marker Registration

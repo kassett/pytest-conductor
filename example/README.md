@@ -35,11 +35,13 @@ example/
 
 2. **Install pytest-conductor:**
    ```bash
+   # Option 1: Install from PyPI
    pip install pytest-conductor
-   ```
-
-   Or install with the dev dependencies:
-   ```bash
+   
+   # Option 2: Install the local development version (recommended for testing)
+   hatch run pip install -e ../
+   
+   # Option 3: Install with dev dependencies
    pip install -e ".[dev]"
    ```
 
@@ -83,6 +85,72 @@ addopts = "-ra -q --tag-order fast slow --unmatched-order none"
 ```
 
 ## Running Tests
+
+### Interactive Demo
+
+To see pytest-conductor in action with detailed explanations:
+
+```bash
+cd ..  # Go back to main project root
+hatch run demo
+```
+
+This demo shows all features with step-by-step explanations and detailed logging.
+
+### Basic Test Execution
+
+Run all tests:
+```bash
+hatch run pytest
+```
+
+Run with verbose output:
+```bash
+hatch run pytest -v
+```
+
+Run with output capture disabled (see print statements):
+```bash
+hatch run pytest -s
+```
+
+### Test Coordination Examples
+
+Run tests with tag ordering:
+```bash
+hatch run pytest --tag-order fast slow -v
+```
+
+Run tests with fixture ordering:
+```bash
+hatch run pytest --fixture-order basic_calculator advanced_calculator --ordering-mode fixture -v
+```
+
+Run tests with unmatched tests first:
+```bash
+hatch run pytest --tag-order fast slow --unmatched-order first -v
+```
+
+Skip unmatched tests entirely:
+```bash
+hatch run pytest --tag-order fast slow --unmatched-order none -v
+```
+
+### Integration Tests
+
+The project includes comprehensive integration tests that demonstrate all pytest-conductor features:
+
+```bash
+# Run all integration tests
+pytest ../src/integration_tests/ -v -s
+
+# Run specific integration test categories
+pytest ../src/integration_tests/ -k "ordering" -v -s  # Ordering functionality
+pytest ../src/integration_tests/ -k "error" -v -s     # Error handling
+pytest ../src/integration_tests/ -k "performance" -v -s  # Performance tests
+```
+
+See [Integration Tests README](../src/integration_tests/README.md) for detailed information.
 
 ### 1. Basic Tag Ordering
 

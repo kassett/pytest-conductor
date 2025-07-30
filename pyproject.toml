@@ -23,7 +23,7 @@ dynamic = ["version"]
 
 dependencies = [
     "pytest<8.4; python_version == '3.8'",
-    "pytest<9.0; python_version > '3.8'"
+    "pytest<9.0; python_version > '3.8'",
 ]
 
 [project.entry-points."pytest11"]
@@ -32,12 +32,15 @@ conductor = "pytest_conductor.core"
 [tool.hatch.envs.default]
 dev-mode = true
 python = "3.13"
+features = ["dev"]
 
 [tool.hatch.envs.default.env-vars]
 PYTHONPATH = "src"
 
 [tool.hatch.envs.default.scripts]
-test = "pytest src/tests"
+unit-tests = "pytest src/unit_tests"
+integration-tests = "pytest src/integration_tests"
+demo = "python -m src.integration_tests.demo"
 
 [tool.hatch.envs.test]
 # No need to declare pytest again; inherited from project.dependencies
@@ -78,26 +81,3 @@ ignore = []
 
 flake8-quotes = {inline-quotes = "double", multiline-quotes = "double"}
 mccabe = { max-complexity = 20 }
-
-[tool.towncrier]
-directory = ".changeset"
-filename = "CHANGELOG.md"
-start_string = "<!-- towncrier release notes start -->\n"
-underlines = ["", "", ""]
-title_format = "## [{version}](https://github.com/kassett/pytest-conductor/releases/tag/v{version}) - {project_date}"
-issue_format = ""
-
-[[tool.towncrier.type]]
-directory = "major"
-name = "Major"
-showcontent = true
-
-[[tool.towncrier.type]]
-directory = "minor"
-name = "Minor"
-showcontent = true
-
-[[tool.towncrier.type]]
-directory = "patch"
-name = "Patch"
-showcontent = true

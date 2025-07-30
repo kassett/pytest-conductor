@@ -1,0 +1,39 @@
+name: Build and check
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  tag:
+    name: Tag Version
+    permissions: 'write-all'
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip' # caching pip dependencies
+
+      - name: Install Hatch
+        run: pip install hatch
+
+      - name: Check formatting
+        run: hatch fmt --check
+
+      - name: Run unit tests
+        run: hatch run unit-tests
+
+      - name: Build package for publish
+        run: hatch build
+
+      - name: Run integration tests
+        run: hatch run integration-tests
+
