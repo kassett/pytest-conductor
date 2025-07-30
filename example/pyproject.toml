@@ -64,7 +64,7 @@ markers = [
 # addopts = "-ra -q --tag-order unit integration"
 # 
 # # Run tests with basic_calculator first, then advanced_calculator
-# addopts = "-ra -q --fixture-order basic_calculator advanced_calculator --ordering-mode fixture"
+# addopts = "-ra -q --fixture-order basic_calculator advanced_calculator"
 # 
 # # Run unmatched tests last
 # addopts = "-ra -q --tag-order fast slow --unmatched-order last" 

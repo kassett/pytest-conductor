@@ -51,7 +51,7 @@ hatch run pip install -e ../
 
 # Run tests with coordination
 hatch run pytest --tag-order fast slow -v
-hatch run pytest --fixture-order basic_calculator advanced_calculator --ordering-mode fixture -v
+hatch run pytest --fixture-order basic_calculator advanced_calculator -v
 ```
 
 The example project includes:
@@ -62,14 +62,14 @@ The example project includes:
 
 ## Usage
 
-### Ordering Modes
+The plugin supports two mutually exclusive ordering methods:
 
-The plugin supports two ordering modes:
+1. **Tag Ordering**: Order tests by their pytest markers/tags
+2. **Fixture Ordering**: Order tests by the fixtures they use
 
-1. **Mark Mode** (default): Order tests by their pytest markers/tags
-2. **Fixture Mode**: Order tests by the fixtures they use
+**Note**: `--tag-order` and `--fixture-order` are mutually exclusive. You can only specify one of them at a time.
 
-### Mark Mode - Basic Tag Ordering
+### Tag Ordering
 
 Use the `--tag-order` option to specify the order in which tags should run:
 
@@ -79,12 +79,12 @@ pytest --tag-order fast slow integration
 
 This will run all tests with the `fast` tag first, then `slow` tests, then `integration` tests.
 
-### Fixture Mode - Basic Fixture Ordering
+### Fixture Ordering
 
 Use the `--fixture-order` option to specify the order in which fixtures should run:
 
 ```bash
-pytest --fixture-order db redis cache --ordering-mode fixture
+pytest --fixture-order db redis cache
 ```
 
 This will run all tests that use the `db` fixture first, then tests using `redis`, then tests using `cache`.
@@ -100,14 +100,24 @@ When using fixture ordering, the plugin validates that all specified fixtures ar
 
 ```bash
 # This will fail if 'nonexistent_fixture' is not available to all tests
-pytest --fixture-order nonexistent_fixture --ordering-mode fixture
+pytest --fixture-order nonexistent_fixture
 ```
 
-**Error Message**: `ValueError: Fixtures not available to all tests: nonexistent_fixture. Fixture ordering requires all fixtures to be globally available. Make sure these fixtures are defined in a conftest.py file that is accessible to all tests, or use mark ordering instead.`
+**Error Message**: `ValueError: Fixtures not available to all tests: nonexistent_fixture. Fixture ordering requires all fixtures to be globally available. Make sure these fixtures are defined in a conftest.py file that is accessible to all tests, or use tag ordering instead.`
+
+#### Mutually Exclusive Options
+The plugin will throw an error if you try to use both `--tag-order` and `--fixture-order` at the same time:
+
+```bash
+# This will fail
+pytest --tag-order fast slow --fixture-order db redis
+```
+
+**Error Message**: `ValueError: --tag-order and --fixture-order are mutually exclusive. Please specify only one of them.`
 
 #### Best Practices
 - Use global fixtures defined in a root-level `conftest.py` file
-- Use mark ordering for tests with local or conditional fixtures
+- Use tag ordering for tests with local or conditional fixtures
 - Test your configuration with `--collect-only` to catch issues early
 
 ### Handling Unmatched Tests
@@ -117,19 +127,19 @@ Use the `--unmatched-order` option to control how tests without matching tags/fi
 ```bash
 # Run unmatched tests first
 pytest --tag-order fast slow --unmatched-order first
-pytest --fixture-order db redis --ordering-mode fixture --unmatched-order first
+pytest --fixture-order db redis --unmatched-order first
 
 # Run unmatched tests last
 pytest --tag-order fast slow --unmatched-order last
-pytest --fixture-order db redis --ordering-mode fixture --unmatched-order last
+pytest --fixture-order db redis --unmatched-order last
 
 # Run unmatched tests in any order (default)
 pytest --tag-order fast slow --unmatched-order any
-pytest --fixture-order db redis --ordering-mode fixture --unmatched-order any
+pytest --fixture-order db redis --unmatched-order any
 
 # Skip unmatched tests entirely
 pytest --tag-order fast slow --unmatched-order none
-pytest --fixture-order db redis --ordering-mode fixture --unmatched-order none
+pytest --fixture-order db redis --unmatched-order none
 ```
 
 ### New in v0.1.0: Skip Unmatched Tests
@@ -141,12 +151,12 @@ The `--unmatched-order none` option is a new feature that allows you to skip tes
 pytest --tag-order fast slow --unmatched-order none
 
 # Run only tests using specific fixtures, skip all others  
-pytest --fixture-order db redis --ordering-mode fixture --unmatched-order none
+pytest --fixture-order db redis --unmatched-order none
 ```
 
 ### Example Test Structure
 
-#### Mark Mode Example
+#### Tag Ordering Example
 
 ```python
 import pytest
@@ -207,24 +217,25 @@ def test_multiple_fixtures(db, redis):
 
 ## Command Line Options
 
-- `--tag-order TAG1 TAG2 ...`: Specify the order of tags for test execution (mark mode)
-- `--fixture-order FIXTURE1 FIXTURE2 ...`: Specify the order of fixtures for test execution (fixture mode)
-- `--ordering-mode {mark,fixture}`: Choose ordering mode (default: mark)
+- `--tag-order TAG1 TAG2 ...`: Specify the order of tags for test execution
+- `--fixture-order FIXTURE1 FIXTURE2 ...`: Specify the order of fixtures for test execution
 - `--unmatched-order {any,first,last,none}`: How to handle tests without matching tags/fixtures
   - `any`: Run unmatched tests in any order (default)
   - `first`: Run unmatched tests before tagged/fixture tests
   - `last`: Run unmatched tests after tagged/fixture tests
   - `none`: Skip unmatched tests entirely
 
+**Note**: `--tag-order` and `--fixture-order` are mutually exclusive. You can only specify one of them at a time.
+
 ## How It Works
 
-### Mark Mode
+### Tag Ordering
 1. The plugin extracts tags from test markers (pytest.mark)
 2. Tests are sorted based on the specified tag order
 3. Tests with multiple tags use the highest priority tag (first in the order)
 4. Tests without tags are handled according to the `--unmatched-order` setting
 
-### Fixture Mode
+### Fixture Ordering
 1. The plugin extracts fixture names from test function parameters
 2. Tests are sorted based on the specified fixture order
 3. Tests with multiple fixtures use the highest priority fixture (first in the order)
@@ -257,7 +268,7 @@ def test_multiple_fixtures(db, redis, cache):
     assert True
 ```
 
-When running `pytest --fixture-order db redis cache --ordering-mode fixture`, this test will:
+When running `pytest --fixture-order db redis cache`, this test will:
 - Run **once** (not multiple times)
 - Run in the **db** group (since 'db' comes first in the order)
 
@@ -282,7 +293,7 @@ tests/
     └── test_integration.py  # uses global_fixture and integration_fixture
 ```
 
-When running `pytest --fixture-order global_fixture unit_fixture integration_fixture --ordering-mode fixture`:
+When running `pytest --fixture-order global_fixture unit_fixture integration_fixture`:
 - Tests in `unit/` will run first if they use `global_fixture` or `unit_fixture`
 - Tests in `integration/` will run first if they use `global_fixture` or `integration_fixture`
 - The plugin doesn't need to know where the fixture is defined - it just looks at the test parameters
@@ -339,7 +350,7 @@ The plugin guarantees that:
 
 ## Examples
 
-### Mark Mode Examples
+### Tag Ordering Examples
 
 #### Run fast tests first, then slow tests
 ```bash
@@ -356,21 +367,21 @@ pytest --tag-order unit integration --unmatched-order last
 pytest --tag-order smoke full --unmatched-order last
 ```
 
-### Fixture Mode Examples
+### Fixture Ordering Examples
 
 #### Run database tests first, then cache tests
 ```bash
-pytest --fixture-order db cache --ordering-mode fixture
+pytest --fixture-order db cache
 ```
 
 #### Run API tests first, then database tests, with tests without fixtures last
 ```bash
-pytest --fixture-order api db --ordering-mode fixture --unmatched-order last
+pytest --fixture-order api db --unmatched-order last
 ```
 
 #### Run tests with expensive fixtures last
 ```bash
-pytest --fixture-order simple expensive --ordering-mode fixture --unmatched-order first
+pytest --fixture-order simple expensive --unmatched-order first
 ```
 
 ## Testing Edge Cases
@@ -395,7 +406,7 @@ pytest src/unit_tests/test_edge_case_examples.py --tag-order fast slow integrati
 ### Test Multiple Fixtures Ordering
 ```bash
 # Test that tests with multiple fixtures run only once
-pytest src/unit_tests/test_edge_case_examples.py --fixture-order db redis cache --ordering-mode fixture -v
+pytest src/unit_tests/test_edge_case_examples.py --fixture-order db redis cache -v
 ```
 
 ### Test Unmatched Test Handling

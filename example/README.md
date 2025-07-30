@@ -75,7 +75,7 @@ addopts = "-ra -q --tag-order fast slow"
 addopts = "-ra -q --tag-order unit integration"
 
 # Run tests with basic_calculator first, then advanced_calculator
-addopts = "-ra -q --fixture-order basic_calculator advanced_calculator --ordering-mode fixture"
+addopts = "-ra -q --fixture-order basic_calculator advanced_calculator"
 
 # Run unmatched tests last
 addopts = "-ra -q --tag-order fast slow --unmatched-order last"
@@ -123,7 +123,7 @@ hatch run pytest --tag-order fast slow -v
 
 Run tests with fixture ordering:
 ```bash
-hatch run pytest --fixture-order basic_calculator advanced_calculator --ordering-mode fixture -v
+hatch run pytest --fixture-order basic_calculator advanced_calculator -v
 ```
 
 Run tests with unmatched tests first:
@@ -168,12 +168,12 @@ pytest --tag-order unit integration -v
 
 Run tests with basic_calculator first, then advanced_calculator:
 ```bash
-pytest --fixture-order basic_calculator advanced_calculator --ordering-mode fixture -v
+pytest --fixture-order basic_calculator advanced_calculator -v
 ```
 
 Run tests with sample_data first, then test_config:
 ```bash
-pytest --fixture-order sample_data test_config --ordering-mode fixture -v
+pytest --fixture-order sample_data test_config -v
 ```
 
 ### 3. Handling Unmatched Tests
@@ -198,7 +198,7 @@ pytest --tag-order fast slow --unmatched-order none -v
 This demonstrates the fixture validation error:
 ```bash
 # This will fail because local_advanced_fixture is not globally available
-pytest --fixture-order local_advanced_fixture --ordering-mode fixture -v
+pytest --fixture-order local_advanced_fixture -v
 ```
 
 The error occurs because `local_advanced_fixture` is defined in `src/tests/advanced/conftest.py` and is only available to tests in the `advanced/` directory, but not to all tests in the project.
@@ -211,7 +211,7 @@ Tests can have multiple tags and use multiple fixtures:
 pytest --tag-order fast slow integration -v
 
 # Test with multiple fixtures
-pytest --fixture-order basic_calculator sample_data test_config --ordering-mode fixture -v
+pytest --fixture-order basic_calculator sample_data test_config -v
 ```
 
 ## Test Categories
@@ -256,7 +256,7 @@ You can integrate pytest-conductor into your CI/CD pipeline:
   run: pytest --tag-order unit integration --unmatched-order last
 
 - name: Run fixture-ordered tests
-  run: pytest --fixture-order basic_calculator advanced_calculator --ordering-mode fixture
+  run: pytest --fixture-order basic_calculator advanced_calculator
 ```
 
 ## Benefits of This Structure
