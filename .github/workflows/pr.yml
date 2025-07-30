@@ -1,13 +1,13 @@
 name: Build and check
 
 on:
-  push:
+  pull_request:
     branches:
       - main
 
 jobs:
-  tag:
-    name: Tag Version
+  check:
+    name: Check Code
     permissions: 'write-all'
     runs-on: ubuntu-latest
     steps:
