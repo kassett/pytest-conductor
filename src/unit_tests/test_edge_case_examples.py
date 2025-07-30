@@ -71,7 +71,7 @@ def test_multiple_fixtures_db_and_redis(db, redis):
     """
     This test uses both 'db' and 'redis' fixtures.
 
-    When running: pytest --fixture-order db redis cache --ordering-mode fixture
+    When running: pytest --fixture-order db redis cache
     Expected behavior: Runs once in the 'db' group (first matching fixture)
     """
     assert db["type"] == "database"
@@ -82,7 +82,7 @@ def test_multiple_fixtures_redis_and_cache(redis, cache):
     """
     This test uses both 'redis' and 'cache' fixtures.
 
-    When running: pytest --fixture-order db redis cache --ordering-mode fixture
+    When running: pytest --fixture-order db redis cache
     Expected behavior: Runs once in the 'redis' group (first matching fixture)
     """
     assert redis["type"] == "redis"
@@ -93,7 +93,7 @@ def test_multiple_fixtures_all_three(db, redis, cache):
     """
     This test uses all three fixtures: 'db', 'redis', and 'cache'.
 
-    When running: pytest --fixture-order db redis cache --ordering-mode fixture
+    When running: pytest --fixture-order db redis cache
     Expected behavior: Runs once in the 'db' group (first matching fixture)
     """
     assert db["type"] == "database"
@@ -132,10 +132,10 @@ def test_fast_with_db_fixture(db):
     """
     This test has a 'fast' tag and uses the 'db' fixture.
 
-    When running: pytest --tag-order fast slow --ordering-mode mark
+    When running: pytest --tag-order fast slow
     Expected behavior: Runs in the 'fast' group
 
-    When running: pytest --fixture-order db redis --ordering-mode fixture
+    When running: pytest --fixture-order db redis
     Expected behavior: Runs in the 'db' group
     """
     assert db["type"] == "database"
@@ -146,10 +146,10 @@ def test_slow_with_redis_fixture(redis):
     """
     This test has a 'slow' tag and uses the 'redis' fixture.
 
-    When running: pytest --tag-order fast slow --ordering-mode mark
+    When running: pytest --tag-order fast slow
     Expected behavior: Runs in the 'slow' group
 
-    When running: pytest --fixture-order db redis --ordering-mode fixture
+    When running: pytest --fixture-order db redis
     Expected behavior: Runs in the 'redis' group
     """
     assert redis["type"] == "redis"
@@ -180,7 +180,7 @@ def test_guaranteed_run_once_fixtures(db, redis):
     """
     This test demonstrates that tests run only once, even with multiple fixtures.
 
-    When running: pytest --fixture-order db redis cache --ordering-mode fixture
+    When running: pytest --fixture-order db redis cache
     Expected behavior:
     - Runs exactly once (not multiple times)
     - Runs in the 'db' group

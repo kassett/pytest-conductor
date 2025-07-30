@@ -144,8 +144,6 @@ def main():
             "basic_calculator",
             "advanced_calculator",
             "sample_data",
-            "--ordering-mode",
-            "fixture",
             "-v",
         ],
         example_dir,
@@ -192,7 +190,7 @@ def main():
     print("Demonstrates error when trying to order by non-existent fixtures")
 
     result5, duration5 = run_pytest_with_detailed_logging(
-        ["--fixture-order", "nonexistent_fixture", "--ordering-mode", "fixture", "-v"],
+        ["--fixture-order", "nonexistent_fixture", "-v"],
         example_dir,
         "Error Handling: non-existent fixture should cause error",
         show_coordination=False,
@@ -204,6 +202,41 @@ def main():
             print("   ✅ Plugin correctly identified unavailable fixture")
             print("   ✅ Error message explains the issue")
 
+    # Demo 6: Timing demonstration
+    print(f"\n{'='*60}")
+    print("🎯 DEMO 6: Timing Demonstration")
+    print(f"{'='*60}")
+    print("Demonstrates how fixture ordering affects test execution timing")
+    print("Tests with 'no_wait' fixture run quickly, tests with 'wait_3_seconds' take time")
+
+    # Get the path to the timing demo tests
+    current = Path(__file__).parent
+    timing_demo_path = current / "test_timing_demo.py"
+
+    result6, duration6 = run_pytest_with_detailed_logging(
+        [
+            "--fixture-order",
+            "no_wait",
+            "wait_3_seconds",
+            "-v",
+            str(timing_demo_path),
+        ],
+        current,  # Use current directory since the test file is here
+        "Timing Demo: no_wait → wait_3_seconds (should show timing difference)",
+    )
+
+    if result6.returncode == 0:
+        print("\n⏱️  Timing Analysis:")
+        print("   • First 2 tests (no_wait): Should complete quickly (~0.1s)")
+        print("   • Next 2 tests (wait_3_seconds): Should each take ~3s")
+        print("   • Total expected time: ~6.1 seconds")
+        print(f"   • Actual time: {duration6:.2f} seconds")
+        
+        if duration6 > 5:  # Should be around 6 seconds
+            print("   ✅ Timing demonstrates fixture ordering effect")
+        else:
+            print("   ⚠️  Timing may not show expected difference")
+
     # Summary
     print(f"\n{'='*60}")
     print("📊 DEMO SUMMARY")
@@ -213,8 +246,9 @@ def main():
     print(f"✅ Unmatched handling: {'PASSED' if result3.returncode == 0 else 'FAILED'}")
     print(f"✅ Unmatched skipping: {'PASSED' if result4.returncode == 0 else 'FAILED'}")
     print(f"✅ Error handling: {'PASSED' if result5.returncode != 0 else 'FAILED'}")
+    print(f"✅ Timing demonstration: {'PASSED' if result6.returncode == 0 else 'FAILED'}")
 
-    total_time = duration1 + duration2 + duration3 + duration4 + duration5
+    total_time = duration1 + duration2 + duration3 + duration4 + duration5 + duration6
     print(f"\n⏱️  Total demo time: {total_time:.2f} seconds")
 
     print("\n🎉 Demo completed! pytest-conductor successfully coordinated")

@@ -15,13 +15,6 @@ class UnmatchedOrder(Enum):
     NONE = "none"
 
 
-class OrderingMode(Enum):
-    """Enum for ordering mode."""
-
-    MARK = "mark"
-    FIXTURE = "fixture"
-
-
 class BaseOrderingPlugin:
     """Base class for ordering plugins."""
 
@@ -172,7 +165,8 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         "--tag-order",
         action="store",
         nargs="+",
-        help="Order of tags for test execution (e.g., --tag-order fast slow integration)",
+        help="Order of tags for test execution (e.g., --tag-order fast slow integration). "
+        "Mutually exclusive with --fixture-order.",
     )
 
     group.addoption(
@@ -180,15 +174,8 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         action="store",
         nargs="+",
         help="Order of fixtures for test execution "
-        "(e.g., --fixture-order db redis cache)",
-    )
-
-    group.addoption(
-        "--ordering-mode",
-        action="store",
-        choices=["mark", "fixture"],
-        default="mark",
-        help="Ordering mode: mark (for tags) or fixture (for fixtures)",
+        "(e.g., --fixture-order db redis cache). "
+        "Mutually exclusive with --tag-order.",
     )
 
     group.addoption(
@@ -262,7 +249,7 @@ def _validate_fixture_availability(
             f"Fixtures not available to all tests: {', '.join(unavailable_fixtures)}. "
             f"Fixture ordering requires all fixtures to be globally available. "
             f"Make sure these fixtures are defined in a conftest.py file that is "
-            f"accessible to all tests, or use mark ordering instead.",
+            f"accessible to all tests, or use tag ordering instead.",
         )
 
 
@@ -273,28 +260,38 @@ def pytest_collection_modifyitems(
     """Modify the collection order based on test ordering."""
     tag_order = config.getoption("--tag-order")
     fixture_order = config.getoption("--fixture-order")
-    ordering_mode = OrderingMode(config.getoption("--ordering-mode"))
     unmatched_order_str = config.getoption("--unmatched-order")
 
-    # Determine which order to use based on mode and provided options
-    order_list = tag_order if ordering_mode == OrderingMode.MARK else fixture_order
+    # Validate that only one ordering option is specified
+    if tag_order and fixture_order:
+        raise ValueError(
+            "--tag-order and --fixture-order are mutually exclusive. "
+            "Please specify only one of them."
+        )
 
-    if not order_list:
+    # Determine which order to use
+    if tag_order:
+        order_list = tag_order
+        ordering_mode = "mark"
+    elif fixture_order:
+        order_list = fixture_order
+        ordering_mode = "fixture"
+    else:
         return  # No ordering specified
 
     unmatched_order = UnmatchedOrder(unmatched_order_str)
 
     # Validate fixture availability for fixture ordering mode
-    if ordering_mode == OrderingMode.FIXTURE:
+    if ordering_mode == "fixture":
         _validate_fixture_availability(items, fixture_order)
 
     # Create appropriate plugin based on mode
-    if ordering_mode == OrderingMode.MARK:
+    if ordering_mode == "mark":
         plugin = MarkOrderingPlugin(
             order_list=order_list,
             unmatched_order=unmatched_order,
         )
-    else:  # OrderingMode.FIXTURE
+    else:  # fixture mode
         plugin = FixtureOrderingPlugin(
             order_list=order_list,
             unmatched_order=unmatched_order,

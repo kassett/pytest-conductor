@@ -105,8 +105,6 @@ class TestPytestConductorIntegration:
                 "basic_calculator",
                 "advanced_calculator",
                 "sample_data",
-                "--ordering-mode",
-                "fixture",
                 "-v",
             ],
             example_dir,
@@ -198,8 +196,6 @@ class TestPytestConductorIntegration:
             [
                 "--fixture-order",
                 "nonexistent_fixture",
-                "--ordering-mode",
-                "fixture",
                 "-v",
             ],
             example_dir,
@@ -209,8 +205,8 @@ class TestPytestConductorIntegration:
         assert result.returncode != 0, "Fixture scope error should cause failure"
         assert "Fixtures not available to all tests: nonexistent_fixture" in result.stdout
 
-    def test_mixed_tag_and_fixture_ordering(self, example_dir: Path):
-        """Test ordering with both tags and fixtures."""
+    def test_mutually_exclusive_options(self, example_dir: Path):
+        """Test that --tag-order and --fixture-order are mutually exclusive."""
         result, duration = self.run_pytest_with_logging(
             [
                 "--tag-order",
@@ -219,33 +215,14 @@ class TestPytestConductorIntegration:
                 "--fixture-order",
                 "basic_calculator",
                 "advanced_calculator",
-                "--ordering-mode",
-                "mark",
                 "-v",
             ],
             example_dir,
-            "Mixed Ordering: tags (mark mode) with fixture order specified",
+            "Mutually Exclusive Options: should fail when both are specified",
         )
 
-        assert result.returncode == 0, "Mixed ordering should succeed"
-
-        # In mark mode, fixture-order should be ignored,
-        # so this should work like tag ordering
-        output_lines = result.stdout.split("\n")
-        test_lines = [
-            line for line in output_lines if "test_" in line and "PASSED" in line
-        ]
-
-        # Should see fast tests before slow tests
-        fast_tests = [line for line in test_lines if "fast" in line.lower()]
-        slow_tests = [line for line in test_lines if "slow" in line.lower()]
-
-        if fast_tests and slow_tests:
-            first_fast_idx = test_lines.index(fast_tests[0])
-            first_slow_idx = test_lines.index(slow_tests[0])
-            assert (
-                first_fast_idx < first_slow_idx
-            ), "Fast tests should run before slow tests in mark mode"
+        assert result.returncode != 0, "Should fail when both options are specified"
+        assert "--tag-order and --fixture-order are mutually exclusive" in result.stdout
 
     def test_complex_ordering_scenario(self, example_dir: Path):
         """Test a complex ordering scenario with multiple tags and fixtures."""
@@ -351,7 +328,6 @@ class TestPytestConductorIntegration:
         expected_options = [
             "--tag-order",
             "--fixture-order",
-            "--ordering-mode",
             "--unmatched-order",
         ]
 

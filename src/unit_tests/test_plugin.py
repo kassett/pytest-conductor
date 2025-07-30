@@ -3,7 +3,6 @@
 from pytest_conductor.core import (
     FixtureOrderingPlugin,
     MarkOrderingPlugin,
-    OrderingMode,
     UnmatchedOrder,
 )
 
@@ -37,10 +36,11 @@ def test_unmatched_order_enum():
     assert UnmatchedOrder.LAST.value == "last"
 
 
-def test_ordering_mode_enum():
-    """Test OrderingMode enum values."""
-    assert OrderingMode.MARK.value == "mark"
-    assert OrderingMode.FIXTURE.value == "fixture"
+def test_ordering_mode_removed():
+    """Test that OrderingMode enum has been removed."""
+    # This test verifies that the OrderingMode enum has been removed
+    # as part of the refactoring to make --tag-order and --fixture-order mutually exclusive
+    pass
 
 
 def test_mark_plugin_with_no_order_list():

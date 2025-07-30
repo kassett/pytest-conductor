@@ -18,8 +18,6 @@ class TestFixtureValidation:
                 "src/unit_tests/test_fixture_ordering.py",
                 "--fixture-order",
                 "nonexistent_fixture",
-                "--ordering-mode",
-                "fixture",
                 "--collect-only",
             ],
             capture_output=True,
@@ -47,8 +45,6 @@ class TestFixtureValidation:
                 "--fixture-order",
                 "nonexistent_fixture",
                 "another_nonexistent",
-                "--ordering-mode",
-                "fixture",
                 "--collect-only",
             ],
             capture_output=True,
@@ -75,8 +71,6 @@ class TestFixtureValidation:
                 "--fixture-order",
                 "db",
                 "redis",
-                "--ordering-mode",
-                "fixture",
                 "--collect-only",
             ],
             capture_output=True,
@@ -87,9 +81,9 @@ class TestFixtureValidation:
         # Should succeed because db and redis fixtures are available
         assert result.returncode == 0
 
-    def test_no_error_for_mark_mode(self):
-        """Test that no error is thrown when using mark mode."""
-        # Run pytest with mark mode (should not validate fixtures)
+    def test_no_error_for_tag_mode(self):
+        """Test that no error is thrown when using tag mode."""
+        # Run pytest with tag mode (should not validate fixtures)
         result = subprocess.run(
             [
                 "python",
@@ -107,5 +101,5 @@ class TestFixtureValidation:
             check=True,
         )
 
-        # Should succeed because mark mode doesn't validate fixtures
+        # Should succeed because tag mode doesn't validate fixtures
         assert result.returncode == 0
