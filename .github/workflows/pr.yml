@@ -35,12 +35,14 @@ jobs:
           echo "Current version from hatch: $current_version"
           echo "Latest tag in Git: $latest_tag"
           
-          if [ "$(printf '%s\n' "$current_version" "$latest_tag" | sort -V | tail -n1)" != "$current_version" ]; then
+          # Compare strictly: current_version must be greater than latest_tag
+          if [ "$current_version" = "$latest_tag" ] || \
+             [ "$(printf '%s\n' "$current_version" "$latest_tag" | sort -V | tail -n1)" != "$current_version" ]; then
             echo "❌ Error: hatch version ($current_version) is not greater than the latest tag ($latest_tag)"
             exit 1
           fi
           
-          echo "✅ hatch version ($current_version) is greater than latest tag ($latest_tag)"
+          echo "✅ hatch version ($current_version) is strictly greater than latest tag ($latest_tag)"
 
       - name: Check formatting
         run: hatch fmt --check
