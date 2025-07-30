@@ -39,7 +39,8 @@ def test_unmatched_order_enum():
 def test_ordering_mode_removed():
     """Test that OrderingMode enum has been removed."""
     # This test verifies that the OrderingMode enum has been removed
-    # as part of the refactoring to make --tag-order and --fixture-order mutually exclusive
+    # as part of the refactoring to make
+    # --tag-order and --fixture-order mutually exclusive
     pass
 
 

@@ -207,7 +207,8 @@ def main():
     print("🎯 DEMO 6: Timing Demonstration")
     print(f"{'='*60}")
     print("Demonstrates how fixture ordering affects test execution timing")
-    print("Tests with 'no_wait' fixture run quickly, tests with 'wait_3_seconds' take time")
+    print("Tests with 'no_wait' fixture run quickly,"
+          " tests with 'wait_3_seconds' take time")
 
     # Get the path to the timing demo tests
     current = Path(__file__).parent
