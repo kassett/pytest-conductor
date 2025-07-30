@@ -166,7 +166,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         action="store",
         nargs="+",
         help="Order of tags for test execution "
-             "(e.g., --tag-order fast slow integration). "
+        "(e.g., --tag-order fast slow integration). "
         "Mutually exclusive with --fixture-order.",
     )
 
