@@ -1,1 +1,1 @@
-"""Integration tests for pytest-conductor.""" 
+"""Integration tests for pytest-conductor."""

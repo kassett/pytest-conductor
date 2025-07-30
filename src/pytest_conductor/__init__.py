@@ -3,4 +3,4 @@
 VERSION = "0.1.0"
 
 # Import hooks to register them with pytest
-from . import hooks
+from . import hooks  # noqa

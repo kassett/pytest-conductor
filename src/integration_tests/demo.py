@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Demo script for pytest-conductor integration tests.
 
@@ -15,10 +14,10 @@ from typing import List, Tuple
 
 
 def run_pytest_with_detailed_logging(
-    args: List[str], 
+    args: List[str],
     cwd: Path,
     description: str,
-    show_coordination: bool = True
+    show_coordination: bool = True,
 ) -> Tuple[subprocess.CompletedProcess, float]:
     """Run pytest with detailed logging and coordination explanation."""
     print(f"\n{'='*80}")
@@ -26,41 +25,41 @@ def run_pytest_with_detailed_logging(
     print(f"📁 Working directory: {cwd}")
     print(f"🔧 Command: pytest {' '.join(args)}")
     print(f"{'='*80}")
-    
+
     if show_coordination:
-        print(f"\n📋 COORDINATION EXPLANATION:")
-        print(f"   • pytest-conductor will collect all tests first")
-        print(f"   • Then analyze test markers/fixtures based on ordering mode")
-        print(f"   • Sort tests according to the specified order")
-        print(f"   • Handle unmatched tests based on --unmatched-order setting")
-        print(f"   • Execute tests in the coordinated order")
-    
-    print(f"\n🚀 EXECUTING...")
+        print("\n📋 COORDINATION EXPLANATION:")
+        print("   • pytest-conductor will collect all tests first")
+        print("   • Then analyze test markers/fixtures based on ordering mode")
+        print("   • Sort tests according to the specified order")
+        print("   • Handle unmatched tests based on --unmatched-order setting")
+        print("   • Execute tests in the coordinated order")
+
+    print("\n🚀 EXECUTING...")
     start_time = time.time()
     result = subprocess.run(
         [sys.executable, "-m", "pytest"] + args,
         cwd=cwd,
         capture_output=True,
         text=True,
-        env={**os.environ, "PYTHONPATH": str(cwd)}
+        env={**os.environ, "PYTHONPATH": str(cwd)},
     )
     end_time = time.time()
-    
+
     print(f"\n⏱️  Execution time: {end_time - start_time:.2f} seconds")
     print(f"📊 Exit code: {result.returncode}")
-    
+
     if result.stdout:
-        print(f"\n📤 STDOUT:")
+        print("\n📤 STDOUT:")
         print(f"{'─'*40}")
         print(result.stdout)
         print(f"{'─'*40}")
-    
+
     if result.stderr:
-        print(f"\n📤 STDERR:")
+        print("\n📤 STDERR:")
         print(f"{'─'*40}")
         print(result.stderr)
         print(f"{'─'*40}")
-    
+
     print(f"{'='*80}\n")
     return result, end_time - start_time
 
@@ -68,151 +67,159 @@ def run_pytest_with_detailed_logging(
 def analyze_test_order(output: str, order_type: str) -> None:
     """Analyze and explain the test execution order."""
     print(f"\n🔍 ORDER ANALYSIS ({order_type}):")
-    
+
     # Extract test execution lines
-    lines = output.split('\n')
+    lines = output.split("\n")
     test_lines = []
     for line in lines:
-        if 'test_' in line and ('::' in line or '[' in line) and '%' in line:
+        if "test_" in line and ("::" in line or "[" in line) and "%" in line:
             test_lines.append(line.strip())
-    
+
     if test_lines:
-        print(f"   📋 Test execution order:")
+        print("   📋 Test execution order:")
         for i, line in enumerate(test_lines, 1):
             # Extract test name
-            if '::' in line:
-                test_name = line.split('::')[-1].split()[0]
+            if "::" in line:
+                test_name = line.split("::")[-1].split()[0]
             else:
-                test_name = line.split('[')[0].strip()
+                test_name = line.split("[")[0].strip()
             print(f"   {i:2d}. {test_name}")
-        
-        print(f"\n   ✅ Order verification:")
+
+        print("\n   ✅ Order verification:")
         if order_type == "tag":
-            print(f"   • Fast tests (unit) should run first")
-            print(f"   • Slow tests (integration) should run second")
-            print(f"   • Tests with multiple tags use first match")
+            print("   • Fast tests (unit) should run first")
+            print("   • Slow tests (integration) should run second")
+            print("   • Tests with multiple tags use first match")
         elif order_type == "fixture":
-            print(f"   • Tests using 'basic_calculator' fixture first")
-            print(f"   • Tests using 'advanced_calculator' fixture second")
-            print(f"   • Tests using 'sample_data' fixture third")
+            print("   • Tests using 'basic_calculator' fixture first")
+            print("   • Tests using 'advanced_calculator' fixture second")
+            print("   • Tests using 'sample_data' fixture third")
         elif order_type == "unmatched":
-            print(f"   • Unmatched tests should be handled according to --unmatched-order")
+            print("   • Unmatched tests should be handled according to --unmatched-order")
     else:
-        print(f"   ⚠️  Could not extract test order from output")
+        print("   ⚠️  Could not extract test order from output")
 
 
 def main():
     """Main demo function."""
-    print(f"🎭 PYTEST-CONDUCTOR INTEGRATION DEMO")
-    print(f"=====================================")
-    print(f"This demo shows how pytest-conductor coordinates test execution")
-    print(f"in a real-world example project with detailed logging.\n")
-    
+    print("🎭 PYTEST-CONDUCTOR INTEGRATION DEMO")
+    print("=====================================")
+    print("This demo shows how pytest-conductor coordinates test execution")
+    print("in a real-world example project with detailed logging.\n")
+
     # Get paths
     current = Path(__file__).parent
     project_root = current.parent.parent
     example_dir = project_root / "example"
-    
-    print(f"📂 Project structure:")
+
+    print("📂 Project structure:")
     print(f"   • Main project: {project_root}")
     print(f"   • Example project: {example_dir}")
     print(f"   • Integration tests: {current}")
-    
+
     # Demo 1: Basic tag ordering
     print(f"\n{'='*60}")
-    print(f"🎯 DEMO 1: Basic Tag Ordering")
+    print("🎯 DEMO 1: Basic Tag Ordering")
     print(f"{'='*60}")
-    print(f"Demonstrates ordering tests by pytest markers (fast → slow → integration)")
-    
+    print("Demonstrates ordering tests by pytest markers (fast → slow → integration)")
+
     result1, duration1 = run_pytest_with_detailed_logging(
         ["--tag-order", "fast", "slow", "integration", "-v"],
         example_dir,
-        "Tag Ordering: fast → slow → integration"
+        "Tag Ordering: fast → slow → integration",
     )
-    
+
     if result1.returncode == 0:
         analyze_test_order(result1.stdout, "tag")
-    
+
     # Demo 2: Fixture ordering
     print(f"\n{'='*60}")
-    print(f"🎯 DEMO 2: Fixture Ordering")
+    print("🎯 DEMO 2: Fixture Ordering")
     print(f"{'='*60}")
-    print(f"Demonstrates ordering tests by the fixtures they use")
-    
+    print("Demonstrates ordering tests by the fixtures they use")
+
     result2, duration2 = run_pytest_with_detailed_logging(
-        ["--fixture-order", "basic_calculator", "advanced_calculator", "sample_data", "--ordering-mode", "fixture", "-v"],
+        [
+            "--fixture-order",
+            "basic_calculator",
+            "advanced_calculator",
+            "sample_data",
+            "--ordering-mode",
+            "fixture",
+            "-v",
+        ],
         example_dir,
-        "Fixture Ordering: basic_calculator → advanced_calculator → sample_data"
+        "Fixture Ordering: basic_calculator → advanced_calculator → sample_data",
     )
-    
+
     if result2.returncode == 0:
         analyze_test_order(result2.stdout, "fixture")
-    
+
     # Demo 3: Unmatched test handling
     print(f"\n{'='*60}")
-    print(f"🎯 DEMO 3: Unmatched Test Handling")
+    print("🎯 DEMO 3: Unmatched Test Handling")
     print(f"{'='*60}")
-    print(f"Demonstrates how tests without matching tags are handled")
-    
+    print("Demonstrates how tests without matching tags are handled")
+
     result3, duration3 = run_pytest_with_detailed_logging(
         ["--tag-order", "fast", "slow", "--unmatched-order", "first", "-v"],
         example_dir,
-        "Unmatched Order: first (untagged tests run first)"
+        "Unmatched Order: first (untagged tests run first)",
     )
-    
+
     if result3.returncode == 0:
         analyze_test_order(result3.stdout, "unmatched")
-    
+
     # Demo 4: Unmatched test skipping
     print(f"\n{'='*60}")
-    print(f"🎯 DEMO 4: Skipping Unmatched Tests")
+    print("🎯 DEMO 4: Skipping Unmatched Tests")
     print(f"{'='*60}")
-    print(f"Demonstrates skipping tests that don't match the order list")
-    
+    print("Demonstrates skipping tests that don't match the order list")
+
     result4, duration4 = run_pytest_with_detailed_logging(
         ["--tag-order", "fast", "slow", "--unmatched-order", "none", "-v"],
         example_dir,
-        "Unmatched Order: none (skip untagged tests)"
+        "Unmatched Order: none (skip untagged tests)",
     )
-    
+
     if result4.returncode == 0:
         analyze_test_order(result4.stdout, "unmatched")
-    
+
     # Demo 5: Error handling
     print(f"\n{'='*60}")
-    print(f"🎯 DEMO 5: Error Handling")
+    print("🎯 DEMO 5: Error Handling")
     print(f"{'='*60}")
-    print(f"Demonstrates error when trying to order by non-existent fixtures")
-    
+    print("Demonstrates error when trying to order by non-existent fixtures")
+
     result5, duration5 = run_pytest_with_detailed_logging(
         ["--fixture-order", "nonexistent_fixture", "--ordering-mode", "fixture", "-v"],
         example_dir,
         "Error Handling: non-existent fixture should cause error",
-        show_coordination=False
+        show_coordination=False,
     )
-    
+
     if result5.returncode != 0:
-        print(f"\n❌ Expected error occurred:")
+        print("\n❌ Expected error occurred:")
         if "Fixtures not available to all tests" in result5.stdout:
-            print(f"   ✅ Plugin correctly identified unavailable fixture")
-            print(f"   ✅ Error message explains the issue")
-    
+            print("   ✅ Plugin correctly identified unavailable fixture")
+            print("   ✅ Error message explains the issue")
+
     # Summary
     print(f"\n{'='*60}")
-    print(f"📊 DEMO SUMMARY")
+    print("📊 DEMO SUMMARY")
     print(f"{'='*60}")
     print(f"✅ Tag ordering: {'PASSED' if result1.returncode == 0 else 'FAILED'}")
     print(f"✅ Fixture ordering: {'PASSED' if result2.returncode == 0 else 'FAILED'}")
     print(f"✅ Unmatched handling: {'PASSED' if result3.returncode == 0 else 'FAILED'}")
     print(f"✅ Unmatched skipping: {'PASSED' if result4.returncode == 0 else 'FAILED'}")
     print(f"✅ Error handling: {'PASSED' if result5.returncode != 0 else 'FAILED'}")
-    
+
     total_time = duration1 + duration2 + duration3 + duration4 + duration5
     print(f"\n⏱️  Total demo time: {total_time:.2f} seconds")
-    
-    print(f"\n🎉 Demo completed! pytest-conductor successfully coordinated")
-    print(f"   test execution across all scenarios.")
+
+    print("\n🎉 Demo completed! pytest-conductor successfully coordinated")
+    print("   test execution across all scenarios.")
 
 
 if __name__ == "__main__":
-    main() 
+    main()

@@ -1,22 +1,22 @@
 """Global fixtures for the calculator tests."""
 
 import pytest
-from calculator import Calculator, AdvancedCalculator
+from calculator import AdvancedCalculator, Calculator
 
 
-@pytest.fixture
+@pytest.fixture()
 def basic_calculator():
     """Provide a basic calculator instance."""
     return Calculator()
 
 
-@pytest.fixture
+@pytest.fixture()
 def advanced_calculator():
     """Provide an advanced calculator instance."""
     return AdvancedCalculator()
 
 
-@pytest.fixture
+@pytest.fixture()
 def sample_data():
     """Provide sample data for testing."""
     return {
@@ -26,7 +26,7 @@ def sample_data():
     }
 
 
-@pytest.fixture
+@pytest.fixture()
 def test_config():
     """Provide test configuration."""
     return {"timeout": 30, "retries": 3, "debug": True}

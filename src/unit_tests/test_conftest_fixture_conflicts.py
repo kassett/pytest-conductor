@@ -1,18 +1,20 @@
 """Tests for conftest fixture name conflicts."""
 
-import pytest
 import tempfile
-import os
-import shutil
 from pathlib import Path
+
+# Import the plugin classes for testing
+from pytest_conductor.core import FixtureOrderingPlugin, UnmatchedOrder
 
 
 class TestConftestFixtureConflicts:
-    """Test scenarios where multiple fixtures have the same name in different conftest files."""
+    """Test scenarios where multiple fixtures have
+    the same name in different conftest files."""
 
     def test_fixture_name_conflict_detection(self):
         """
-        Test that the plugin correctly detects fixtures even when there are name conflicts.
+        Test that the plugin correctly detects fixtures
+        even when there are name conflicts.
 
         When multiple conftest.py files define fixtures with the same name,
         pytest will use the closest one (nearest to the test file).
@@ -23,7 +25,8 @@ class TestConftestFixtureConflicts:
             unmatched_order=UnmatchedOrder.LAST,
         )
 
-        # Create a mock item that uses a fixture that might be defined in multiple conftest files
+        # Create a mock item that uses a fixture that
+        # might be defined in multiple conftest files
         class MockItem:
             def __init__(self, name):
                 self.name = name
@@ -31,7 +34,8 @@ class TestConftestFixtureConflicts:
         class MockFunction:
             def __init__(self):
                 class MockCode:
-                    # This test uses a fixture that might be defined in multiple conftest files
+                    # This test uses a fixture that might be
+                    # defined in multiple conftest files
                     co_varnames = ("conflicting_fixture", "other_fixture")
                     co_argcount = 2
 
@@ -40,7 +44,8 @@ class TestConftestFixtureConflicts:
         item = MockItem("test_conflicting_fixture")
         item.function = MockFunction()
 
-        # Extract names - should detect the fixture name regardless of which conftest defines it
+        # Extract names - should detect the fixture name
+        # regardless of which conftest defines it
         names = plugin._extract_names(item)
         assert names == {"conflicting_fixture", "other_fixture"}
 
@@ -110,7 +115,7 @@ def test_fixture_resolution(conflicting_fixture, other_fixture, subdir_only_fixt
     # other_fixture should come from root conftest (only definition)
     assert other_fixture["source"] == "root"
     assert other_fixture["value"] == "other_value"
-    
+        
     # subdir_only_fixture should come from subdir conftest
     assert subdir_only_fixture["source"] == "subdir"
     assert subdir_only_fixture["value"] == "subdir_only"
@@ -191,12 +196,13 @@ def test_plugin_detection(conflicting_fixture, other_fixture, subdir_only_fixtur
         # Sort the items
         sorted_items = plugin.sort_items(items)
 
-        # Verify order: conflicting_fixture tests first, then other_fixture, then subdir_only_fixture, then unmatched
+        # Verify order: conflicting_fixture tests first, then other_fixture,
+        # then subdir_only_fixture, then unmatched
         # When tests have the same order key, they're sorted alphabetically by name
         expected_order = [
             "test_all_fixtures",  # conflicting_fixture (index 0) - alphabetically first
-            "test_conflicting_only",  # conflicting_fixture (index 0) - alphabetically second
-            "test_multiple_conflicts",  # conflicting_fixture (index 0) - alphabetically third
+            "test_conflicting_only",  # conflicting_fixture (index 0) - alph second
+            "test_multiple_conflicts",  # conflicting_fixture (index 0) - alph third
             "test_other_only",  # other_fixture (index 1)
             "test_subdir_only",  # subdir_only_fixture (index 2)
             "test_no_fixtures",  # unmatched (index 3)
@@ -204,7 +210,3 @@ def test_plugin_detection(conflicting_fixture, other_fixture, subdir_only_fixtur
 
         actual_order = [item.name for item in sorted_items]
         assert actual_order == expected_order
-
-
-# Import the plugin classes for testing
-from pytest_conductor.core import FixtureOrderingPlugin, UnmatchedOrder

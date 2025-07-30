@@ -60,10 +60,9 @@ class BaseOrderingPlugin:
             # No names found, handle based on unmatched_order setting
             if self.unmatched_order == UnmatchedOrder.FIRST:
                 return (-1, item.name)
-            elif self.unmatched_order == UnmatchedOrder.LAST:
+            if self.unmatched_order == UnmatchedOrder.LAST:
                 return (len(self.order_list), item.name)
-            else:  # UnmatchedOrder.ANY
-                return (0, item.name)
+            return (0, item.name)
 
         # Find the highest priority name (lowest index) for this test
         min_index = min(
@@ -99,13 +98,10 @@ class BaseOrderingPlugin:
             matched_items = []
             for item in items:
                 names = self._extract_names(item)
-                if names:
-                    # Check if any of the test's names are in our order list
-                    if any(name in self.name_to_index for name in names):
-                        matched_items.append(item)
+                if names and any(name in self.name_to_index for name in names):
+                    matched_items.append(item)
             return sorted(matched_items, key=self.get_test_order_key)
-        else:
-            return sorted(items, key=self.get_test_order_key)
+        return sorted(items, key=self.get_test_order_key)
 
 
 class MarkOrderingPlugin(BaseOrderingPlugin):
@@ -183,7 +179,8 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         "--fixture-order",
         action="store",
         nargs="+",
-        help="Order of fixtures for test execution (e.g., --fixture-order db redis cache)",
+        help="Order of fixtures for test execution "
+        "(e.g., --fixture-order db redis cache)",
     )
 
     group.addoption(
@@ -199,12 +196,14 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         action="store",
         choices=["any", "first", "last", "none"],
         default="any",
-        help="How to handle tests without matching tags/fixtures: any, first, last, or none (skip unmatched tests)",
+        help="How to handle tests without matching tags/fixtures: "
+        "any, first, last, or none (skip unmatched tests)",
     )
 
 
 def _validate_fixture_availability(
-    items: List[pytest.Item], fixture_order: List[str]
+    items: List[pytest.Item],
+    fixture_order: List[str],
 ) -> None:
     """
     Validate that all fixtures in the order list are available to all tests.
@@ -263,12 +262,13 @@ def _validate_fixture_availability(
             f"Fixtures not available to all tests: {', '.join(unavailable_fixtures)}. "
             f"Fixture ordering requires all fixtures to be globally available. "
             f"Make sure these fixtures are defined in a conftest.py file that is "
-            f"accessible to all tests, or use mark ordering instead."
+            f"accessible to all tests, or use mark ordering instead.",
         )
 
 
 def pytest_collection_modifyitems(
-    config: pytest.Config, items: List[pytest.Item]
+    config: pytest.Config,
+    items: List[pytest.Item],
 ) -> None:
     """Modify the collection order based on test ordering."""
     tag_order = config.getoption("--tag-order")
@@ -277,10 +277,7 @@ def pytest_collection_modifyitems(
     unmatched_order_str = config.getoption("--unmatched-order")
 
     # Determine which order to use based on mode and provided options
-    if ordering_mode == OrderingMode.MARK:
-        order_list = tag_order
-    else:  # OrderingMode.FIXTURE
-        order_list = fixture_order
+    order_list = tag_order if ordering_mode == OrderingMode.MARK else fixture_order
 
     if not order_list:
         return  # No ordering specified
@@ -294,11 +291,13 @@ def pytest_collection_modifyitems(
     # Create appropriate plugin based on mode
     if ordering_mode == OrderingMode.MARK:
         plugin = MarkOrderingPlugin(
-            order_list=order_list, unmatched_order=unmatched_order
+            order_list=order_list,
+            unmatched_order=unmatched_order,
         )
     else:  # OrderingMode.FIXTURE
         plugin = FixtureOrderingPlugin(
-            order_list=order_list, unmatched_order=unmatched_order
+            order_list=order_list,
+            unmatched_order=unmatched_order,
         )
 
     # Sort the items

@@ -3,13 +3,13 @@
 import pytest
 
 
-@pytest.fixture
+@pytest.fixture()
 def local_advanced_fixture():
     """A fixture that's only available in this subdirectory."""
     return {"type": "advanced", "scope": "local", "data": [10, 20, 30, 40, 50]}
 
 
-@pytest.fixture
+@pytest.fixture()
 def specialized_config():
     """A specialized configuration only for advanced tests."""
     return {"advanced_mode": True, "precision": "high", "cache_size": 1000}

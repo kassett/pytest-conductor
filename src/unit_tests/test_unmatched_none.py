@@ -1,10 +1,9 @@
 """Tests for the 'none' unmatched-order functionality."""
 
-import pytest
 from pytest_conductor.core import (
-    UnmatchedOrder,
-    MarkOrderingPlugin,
     FixtureOrderingPlugin,
+    MarkOrderingPlugin,
+    UnmatchedOrder,
 )
 
 
@@ -12,9 +11,11 @@ class TestUnmatchedNone:
     """Test that unmatched tests are filtered out when unmatched_order is NONE."""
 
     def test_mark_plugin_none_unmatched_order(self):
-        """Test that mark plugin filters out unmatched tests when unmatched_order is NONE."""
+        """Test that mark plugin filters out unmatched
+        tests when unmatched_order is NONE."""
         plugin = MarkOrderingPlugin(
-            order_list=["fast", "slow"], unmatched_order=UnmatchedOrder.NONE
+            order_list=["fast", "slow"],
+            unmatched_order=UnmatchedOrder.NONE,
         )
 
         # Create mock items
@@ -49,9 +50,11 @@ class TestUnmatchedNone:
         assert sorted_items[2].name == "test_slow"
 
     def test_fixture_plugin_none_unmatched_order(self):
-        """Test that fixture plugin filters out unmatched tests when unmatched_order is NONE."""
+        """Test that fixture plugin filters out
+        unmatched tests when unmatched_order is NONE."""
         plugin = FixtureOrderingPlugin(
-            order_list=["db", "redis"], unmatched_order=UnmatchedOrder.NONE
+            order_list=["db", "redis"],
+            unmatched_order=UnmatchedOrder.NONE,
         )
 
         # Create mock items
@@ -95,12 +98,14 @@ class TestUnmatchedNone:
         """Test that NONE behaves differently from other unmatched_order options."""
         # Test with NONE
         plugin_none = MarkOrderingPlugin(
-            order_list=["fast"], unmatched_order=UnmatchedOrder.NONE
+            order_list=["fast"],
+            unmatched_order=UnmatchedOrder.NONE,
         )
 
         # Test with ANY
         plugin_any = MarkOrderingPlugin(
-            order_list=["fast"], unmatched_order=UnmatchedOrder.ANY
+            order_list=["fast"],
+            unmatched_order=UnmatchedOrder.ANY,
         )
 
         # Create mock items

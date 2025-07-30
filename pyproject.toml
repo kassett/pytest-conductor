@@ -73,11 +73,26 @@ markers = [
 
 [tool.ruff.lint]
 select = [
-    "F", "E", "W", "N", "I", "S", "BLE", "COM", "DTZ", "C4", "EM", "EXE",
+    "F", "E", "W", "N", "I", "S", "BLE", "DTZ", "C4", "EM", "EXE",
     "ISC", "ICN", "G", "PT", "Q", "RSE", "RET", "SLOT", "SIM", "TID", "ARG", "TCH", "PTH",
     "ERA", "PD", "C", "R", "TRY", "NPY", "RUF"
 ]
-ignore = []
+ignore = [
+    "ISC001",
+    "S607",
+    "S603",
+    "TRY003",
+    "EM102",
+    "W293",
+    "RUF005",
+    "G004",
+    "EM101",
+    "PT017"
+]
 
 flake8-quotes = {inline-quotes = "double", multiline-quotes = "double"}
 mccabe = { max-complexity = 20 }
+
+[tool.ruff.lint.per-file-ignores]
+"**/*_tests/**" = ["S101"]
+"**/tests/**" = ["S101"]

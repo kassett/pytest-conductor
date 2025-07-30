@@ -2,14 +2,13 @@
 
 import pytest
 
-
 # ============================================================================
 # Edge Case 1: Tests with multiple tags
 # ============================================================================
 
 
-@pytest.mark.fast
-@pytest.mark.slow
+@pytest.mark.fast()
+@pytest.mark.slow()
 def test_multiple_tags_fast_and_slow():
     """
     This test has both 'fast' and 'slow' tags.
@@ -20,8 +19,8 @@ def test_multiple_tags_fast_and_slow():
     assert True
 
 
-@pytest.mark.slow
-@pytest.mark.integration
+@pytest.mark.slow()
+@pytest.mark.integration()
 def test_multiple_tags_slow_and_integration():
     """
     This test has both 'slow' and 'integration' tags.
@@ -32,9 +31,9 @@ def test_multiple_tags_slow_and_integration():
     assert True
 
 
-@pytest.mark.fast
-@pytest.mark.slow
-@pytest.mark.integration
+@pytest.mark.fast()
+@pytest.mark.slow()
+@pytest.mark.integration()
 def test_multiple_tags_all_three():
     """
     This test has all three tags: 'fast', 'slow', and 'integration'.
@@ -50,19 +49,19 @@ def test_multiple_tags_all_three():
 # ============================================================================
 
 
-@pytest.fixture
+@pytest.fixture()
 def db():
     """Database fixture."""
     return {"type": "database"}
 
 
-@pytest.fixture
+@pytest.fixture()
 def redis():
     """Redis fixture."""
     return {"type": "redis"}
 
 
-@pytest.fixture
+@pytest.fixture()
 def cache():
     """Cache fixture."""
     return {"type": "cache"}
@@ -128,7 +127,7 @@ def test_no_tags_or_fixtures():
 # ============================================================================
 
 
-@pytest.mark.fast
+@pytest.mark.fast()
 def test_fast_with_db_fixture(db):
     """
     This test has a 'fast' tag and uses the 'db' fixture.
@@ -142,7 +141,7 @@ def test_fast_with_db_fixture(db):
     assert db["type"] == "database"
 
 
-@pytest.mark.slow
+@pytest.mark.slow()
 def test_slow_with_redis_fixture(redis):
     """
     This test has a 'slow' tag and uses the 'redis' fixture.
@@ -161,8 +160,8 @@ def test_slow_with_redis_fixture(redis):
 # ============================================================================
 
 
-@pytest.mark.fast
-@pytest.mark.slow
+@pytest.mark.fast()
+@pytest.mark.slow()
 def test_guaranteed_run_once():
     """
     This test demonstrates that tests run only once, even with multiple tags.
@@ -197,7 +196,7 @@ def test_guaranteed_run_once_fixtures(db, redis):
 # ============================================================================
 
 
-@pytest.mark.fast
+@pytest.mark.fast()
 class TestFastClass:
     """Test class with 'fast' tag."""
 
@@ -210,7 +209,7 @@ class TestFastClass:
         assert db["type"] == "database"
 
 
-@pytest.mark.slow
+@pytest.mark.slow()
 class TestSlowClass:
     """Test class with 'slow' tag."""
 
@@ -223,8 +222,8 @@ class TestSlowClass:
         assert cache["type"] == "cache"
 
 
-@pytest.mark.fast
-@pytest.mark.slow
+@pytest.mark.fast()
+@pytest.mark.slow()
 class TestMultipleTagsClass:
     """Test class with multiple tags."""
 

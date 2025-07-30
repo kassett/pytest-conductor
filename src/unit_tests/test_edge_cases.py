@@ -1,10 +1,8 @@
 """Tests for edge cases in the pytest conductor plugin."""
 
-import pytest
 from pytest_conductor.core import (
     FixtureOrderingPlugin,
     MarkOrderingPlugin,
-    OrderingMode,
     UnmatchedOrder,
 )
 
@@ -50,7 +48,8 @@ class TestMultipleFixturesEdgeCase:
     def test_multiple_fixtures_priority_order(self):
         """Test that tests with multiple fixtures run with the first matching fixture."""
         plugin = FixtureOrderingPlugin(
-            order_list=["db", "redis", "cache"], unmatched_order=UnmatchedOrder.LAST
+            order_list=["db", "redis", "cache"],
+            unmatched_order=UnmatchedOrder.LAST,
         )
 
         # Create a mock item with multiple fixtures
@@ -122,7 +121,8 @@ class TestUnmatchedHandling:
     def test_unmatched_tests_first(self):
         """Test that unmatched tests run first when configured."""
         plugin = MarkOrderingPlugin(
-            order_list=["fast", "slow"], unmatched_order=UnmatchedOrder.FIRST
+            order_list=["fast", "slow"],
+            unmatched_order=UnmatchedOrder.FIRST,
         )
 
         class MockItem:
@@ -145,7 +145,8 @@ class TestUnmatchedHandling:
     def test_unmatched_tests_last(self):
         """Test that unmatched tests run last when configured."""
         plugin = MarkOrderingPlugin(
-            order_list=["fast", "slow"], unmatched_order=UnmatchedOrder.LAST
+            order_list=["fast", "slow"],
+            unmatched_order=UnmatchedOrder.LAST,
         )
 
         class MockItem:
@@ -164,7 +165,8 @@ class TestUnmatchedHandling:
     def test_unmatched_tests_any(self):
         """Test that unmatched tests run in any order when configured."""
         plugin = MarkOrderingPlugin(
-            order_list=["fast", "slow"], unmatched_order=UnmatchedOrder.ANY
+            order_list=["fast", "slow"],
+            unmatched_order=UnmatchedOrder.ANY,
         )
 
         class MockItem:
@@ -231,7 +233,8 @@ class TestIntegrationEdgeCases:
     def test_sorting_with_multiple_fixtures(self):
         """Test that sorting works correctly with multiple fixtures."""
         plugin = FixtureOrderingPlugin(
-            order_list=["db", "redis", "cache"], unmatched_order=UnmatchedOrder.LAST
+            order_list=["db", "redis", "cache"],
+            unmatched_order=UnmatchedOrder.LAST,
         )
 
         # Create multiple test items with different fixture combinations

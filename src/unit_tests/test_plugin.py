@@ -11,7 +11,8 @@ from pytest_conductor.core import (
 def test_mark_ordering_plugin_initialization():
     """Test mark ordering plugin initialization."""
     plugin = MarkOrderingPlugin(
-        order_list=["fast", "slow"], unmatched_order=UnmatchedOrder.LAST
+        order_list=["fast", "slow"],
+        unmatched_order=UnmatchedOrder.LAST,
     )
     assert plugin.order_list == ["fast", "slow"]
     assert plugin.unmatched_order == UnmatchedOrder.LAST
@@ -21,7 +22,8 @@ def test_mark_ordering_plugin_initialization():
 def test_fixture_ordering_plugin_initialization():
     """Test fixture ordering plugin initialization."""
     plugin = FixtureOrderingPlugin(
-        order_list=["db", "redis"], unmatched_order=UnmatchedOrder.LAST
+        order_list=["db", "redis"],
+        unmatched_order=UnmatchedOrder.LAST,
     )
     assert plugin.order_list == ["db", "redis"]
     assert plugin.unmatched_order == UnmatchedOrder.LAST

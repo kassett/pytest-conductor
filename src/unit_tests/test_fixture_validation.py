@@ -1,8 +1,6 @@
 """Tests for fixture validation error behavior."""
 
-import pytest
 import subprocess
-import tempfile
 from pathlib import Path
 
 
@@ -106,6 +104,7 @@ class TestFixtureValidation:
             capture_output=True,
             text=True,
             cwd=Path.cwd(),
+            check=True,
         )
 
         # Should succeed because mark mode doesn't validate fixtures
