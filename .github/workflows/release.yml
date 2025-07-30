@@ -1,0 +1,38 @@
+name: Deploy to Prod via Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    name: Publish the package
+    permissions: 'write-all'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Latest Release Tag
+        uses: tagup/actions/actions/latest-release@main
+        id: latest_release_tag
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout Latest Release's Tag
+        if: ${{ github.ref_name == steps.latest_release_tag.outputs.tag }}
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ steps.latest_release_tag.outputs.tag }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip' # caching pip dependencies
+
+      - name: Install Hatch
+        run: pip install hatch
+
+      - name: Build package
+        run: hatch build
+
+      - name: Publish package
+        run: hatch publish
