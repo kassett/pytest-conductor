@@ -25,7 +25,7 @@ See pytest-conductor in action with our interactive demo:
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/pytest-conductor.git
+git clone https://github.com/kassett/pytest-conductor.git
 cd pytest-conductor
 
 # Run the interactive demo
